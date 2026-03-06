@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simon Game</title>
+
+<link rel="stylesheet" href="styles.css">
+<style>
+    body{
+  text-align:center;
+  background-color:#011F3F;
+}
+
+#level-title{
+  font-size:3rem;
+  margin:5%;
+  color:#FEF2BF;
+  font-family:Arial;
+}
+
+.container{
+  display:block;
+  width:50%;
+  margin:auto;
+}
+
+.row{
+  display:flex;
+  justify-content:center;
+}
+
+.btn{
+  margin:25px;
+  height:200px;
+  width:200px;
+  border:10px solid black;
+  border-radius:20%;
+}
+
+.green{
+  background-color:green;
+}
+
+.red{
+  background-color:red;
+}
+
+.yellow{
+  background-color:yellow;
+}
+
+.blue{
+  background-color:blue;
+}
+
+.pressed{
+  box-shadow:0 0 20px white;
+  background-color:grey;
+}
+
+.game-over{
+  background-color:red;
+  opacity:0.8;
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+
+<h1 id="level-title">Press Any Key to Start</h1>
+
+<div class="container">
+
+<div class="row">
+<div type="button" id="green" class="btn green"></div>
+<div type="button" id="red" class="btn red"></div>
+</div>
+
+<div class="row">
+<div type="button" id="yellow" class="btn yellow"></div>
+<div type="button" id="blue" class="btn blue"></div>
+</div>
+
+</div>
+
+<script src="game.js">
+    var buttonColours = ["red","blue","green","yellow"];
+
+var gamePattern = [];
+var userClickedPattern = [];
+
+var started = false;
+var level = 0;
+
+
+$(document).keypress(function(){
+
+if(!started){
+
+$("#level-title").text("Level " + level);
+nextSequence();
+started = true;
+
+}
+
+});
+
+
+$(".btn").click(function(){
+
+var userChosenColour = $(this).attr("id");
+
+userClickedPattern.push(userChosenColour);
+
+playSound(userChosenColour);
+animatePress(userChosenColour);
+
+checkAnswer(userClickedPattern.length-1);
+
+});
+
+
+function checkAnswer(currentLevel){
+
+if(gamePattern[currentLevel] === userClickedPattern[currentLevel]){
+
+if(userClickedPattern.length === gamePattern.length){
+
+setTimeout(function(){
+nextSequence();
+},1000);
+
+}
+
+}else{
+
+playSound("wrong");
+
+$("body").addClass("game-over");
+
+setTimeout(function(){
+$("body").removeClass("game-over");
+},200);
+
+$("#level-title").text("Game Over, Press Any Key to Restart");
+
+startOver();
+
+}
+
+}
+
+
+function nextSequence(){
+
+userClickedPattern = [];
+
+level++;
+
+$("#level-title").text("Level " + level);
+
+var randomNumber = Math.floor(Math.random()*4);
+
+var randomChosenColour = buttonColours[randomNumber];
+
+gamePattern.push(randomChosenColour);
+
+$("#"+randomChosenColour).fadeIn(100).fadeOut(100).fadeIn(100);
+
+playSound(randomChosenColour);
+
+}
+
+
+function animatePress(currentColour){
+
+$("#"+currentColour).addClass("pressed");
+
+setTimeout(function(){
+$("#"+currentColour).removeClass("pressed");
+},100);
+
+}
+
+
+function playSound(name){
+
+var audio = new Audio("sounds/" + name + ".mp3");
+
+audio.play();
+
+}
+
+
+function startOver(){
+
+level = 0;
+gamePattern = [];
+started = false;
+
+}
+</script>
+
+</body>
+</html>
